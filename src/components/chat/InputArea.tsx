@@ -22,7 +22,7 @@ export function InputArea() {
   };
   
   return (
-    <div className="border-t border-[var(--color-accent)] p-4 bg-white dark:bg-gray-800">
+    <div className="p-4 bg-white dark:bg-gray-800">
       <div className="flex gap-2">
         <textarea
           value={input}

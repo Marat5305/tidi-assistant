@@ -4,19 +4,13 @@ import type { Message } from '../types/chat';
 
 interface ChatStore {
   messages: Message[];
+  isMasterMode: boolean;
   sendMessage: (text: string) => void;
 }
 
 export const useChatStore = create<ChatStore>((set) => ({
-  messages: [
-    // Стартовое приветствие
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Привет! Я твой AI-помощник. Задай вопрос или загрузи файл.',
-    },
-  ],
-  
+  messages: [],
+  isMasterMode: true,
   sendMessage: (text: string) => {
     // Добавляем сообщение пользователя
     const userMessage: Message = {
@@ -35,7 +29,10 @@ export const useChatStore = create<ChatStore>((set) => ({
         content: `Ты написал: "${text}". Пока это заглушка, скоро здесь будет настоящий AI!`,
       };
       
-      set((state) => ({ messages: [...state.messages, botMessage] }));
+      set((state) => ({ 
+        messages: [...state.messages, botMessage],
+        isMasterMode: false,   // <-- переключаем режим
+      }));
     }, 500);
   },
 }));
