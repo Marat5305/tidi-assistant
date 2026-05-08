@@ -1,6 +1,7 @@
 // src/components/chat/InputArea.tsx
 import { useState } from 'react';
 import { useChatStore } from '../../store/chatStore';
+import { ArrowUp } from 'lucide-react';
 
 export function InputArea() {
   const [input, setInput] = useState('');
@@ -34,9 +35,10 @@ export function InputArea() {
         <button
           onClick={handleSend}
           disabled={!input.trim()}
-          className="px-4 py-2 bg-[var(--color-accent)] text-white rounded-lg hover:bg-[var(--color-hover)] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-10 h-10 rounded-full bg-[var(--color-accent)] text-white hover:bg-[var(--color-hover)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+          aria-label="Отправить сообщение"
         >
-          Отправить
+          <ArrowUp size={20} />
         </button>
       </div>
     </div>
