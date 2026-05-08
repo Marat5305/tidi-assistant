@@ -12,10 +12,10 @@ export function MessageItem({ message }: MessageItemProps) {
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
         className={`
-          max-w-[70%] rounded-lg px-4 py-2
+          max-w-[70%] rounded-lg px-4 py-2 border 
           ${isUser 
-            ? 'bg-blue-500 text-white' 
-            : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white'
+            ? 'bg-[var(--color-surface)] border-[var(--color-accent)] text-black' 
+            : 'bg-white dark:bg-gray-700 border-[var(--color-surface)] text-gray-900 dark:text-white'
           }
         `}
       >

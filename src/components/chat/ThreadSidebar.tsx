@@ -16,7 +16,7 @@ export function ThreadSidebar() {
   }
   
   return (
-    <aside className="w-64 border-r bg-gray-50 dark:bg-gray-900 p-4 flex flex-col h-full">
+    <aside className="w-64 border-r border-[var(--color-accent)] bg-[var(--color-surface)] p-4 flex flex-col h-full">
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-bold">История</h2>
         <button onClick={toggleSidebar} className="text-gray-500">
