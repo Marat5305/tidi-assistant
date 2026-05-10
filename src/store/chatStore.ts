@@ -11,28 +11,31 @@ interface ChatStore {
 export const useChatStore = create<ChatStore>((set) => ({
   messages: [],
   isMasterMode: true,
+  
   sendMessage: (text: string) => {
-    // Добавляем сообщение пользователя
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
       content: text,
     };
     
-    set((state) => ({ messages: [...state.messages, userMessage] }));
+    set((state) => ({ 
+      messages: [...state.messages, userMessage],
+      isMasterMode: false, // сразу переключаем режим
+    }));
     
-    // Имитация ответа бота (через полсекунды)
+    // Имитация ответа
     setTimeout(() => {
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `Ты написал: "${text}". Пока это заглушка, скоро здесь будет настоящий AI!`,
+        content: `Ты написал: "${text}". Это AI ассистент!`,
       };
       
-      set((state) => ({ 
-        messages: [...state.messages, botMessage],
-        isMasterMode: false,   // <-- переключаем режим
-      }));
+      set((state) => ({ messages: [...state.messages, botMessage] }));
     }, 500);
   },
+  
+  // Добавь метод для возврата в мастер-режим
+  setMasterMode: (enabled: boolean) => set({ isMasterMode: enabled }),
 }));

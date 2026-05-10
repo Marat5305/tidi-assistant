@@ -1,46 +1,48 @@
 import { MessageList } from './MessageList';
 import { InputArea } from './InputArea';
 import { useChatStore } from '../../store/chatStore';
-import { useUIStore } from '../../store/uiStore';
 import { useRef, useEffect, useState } from 'react';
 
 export function ChatContainer() {
   const { messages, isMasterMode } = useChatStore();
-  const { sidebarOpen } = useUIStore();
-  const [containerHeight, setContainerHeight] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [prevMode, setPrevMode] = useState(isMasterMode);
   
-  // Определяем высоту контейнера для центровки
+  // Опционально: синхронизация для анимации
   useEffect(() => {
-    if (containerRef.current) {
-      setContainerHeight(containerRef.current.clientHeight);
-    }
-  }, []);
+    setPrevMode(isMasterMode);
+  }, [isMasterMode]);
   
   return (
     <div 
       ref={containerRef}
-      className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 mx-10"
+      className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 mx-10 relative"
     >
-      {/* Список сообщений - показываем только в режиме чата */}
-      {!isMasterMode && messages.length > 0 && (
-        <div className="flex-1 overflow-y-auto">
-          <MessageList />
-        </div>
-      )}
+      {/* Список сообщений - с плавным появлением/исчезновением */}
+      <div 
+        className={`
+          flex-1 overflow-y-auto transition-all duration-500 ease-out
+          ${isMasterMode ? 'opacity-0 invisible' : 'opacity-100 visible'}
+        `}
+        style={{
+          transitionProperty: 'opacity, visibility',
+        }}
+      >
+        {!isMasterMode && messages.length > 0 && <MessageList />}
+      </div>
       
       {/* Контейнер с полем ввода */}
       <div 
         className={`
           w-full px-4 pb-6 transition-all duration-500 ease-out
-          ${isMasterMode ? 'absolute left-0 right-0 mx-auto' : 'relative mt-auto'}
-          ${isMasterMode ? 'max-w-2xl' : ''}
+          ${isMasterMode 
+            ? 'fixed inset-x-0 top-1/2 -translate-y-1/2 max-w-2xl mx-auto' 
+            : 'relative mt-auto'
+          }
         `}
         style={{
-          top: isMasterMode ? '50%' : 'auto',
-          transform: isMasterMode ? 'translateY(-50%)' : 'none',
-          marginLeft: 'auto',
-          transition: 'all 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1)'
+          transitionProperty: 'top, transform, margin-top', // только вертикаль
+          transitionTimingFunction: 'cubic-bezier(0.34, 1.2, 0.64, 1)',
         }}
       >
         <InputArea />
