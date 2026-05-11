@@ -1,16 +1,23 @@
 import { MessageList } from './MessageList';
 import { InputArea } from './InputArea';
 import { useChatStore } from '../../store/chatStore';
-import { useRef} from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 export function ChatContainer() {
   const { messages, isMasterMode } = useChatStore();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Реф на контейнер поля ввода — нужен, чтобы браузер не кэшировал начальный transform при первом рендере
+  const [isReady, setIsReady] = useState(false);
+  useEffect(() => {
+    // Маленькая задержка, чтобы DOM отрисовался до первой анимации
+    requestAnimationFrame(() => setIsReady(true));
+  }, []);
   
   return (
     <div 
       ref={containerRef}
-      className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 mx-10 relative"
+      className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 mx-auto relative w-[90%] max-w-[900px]"
     >
       {/* Список сообщений - с плавным появлением/исчезновением */}
       <div 
@@ -28,15 +35,19 @@ export function ChatContainer() {
       {/* Контейнер с полем ввода */}
       <div 
         className={`
-          w-full px-4 pb-6 transition-all duration-500 ease-out
+          w-full px-4 pb-6
           ${isMasterMode 
-            ? 'fixed inset-x-0 top-1/2 -translate-y-1/2 max-w-2xl mx-auto' 
-            : 'relative mt-auto'
+            ? 'max-w-2xl mx-auto mt-0' 
+            : 'max-w-full mt-auto'
           }
         `}
         style={{
-          transitionProperty: 'top, transform, margin-top', // только вертикаль
-          transitionTimingFunction: 'cubic-bezier(0.34, 1.2, 0.64, 1)',
+          transform: isReady
+          ? (isMasterMode 
+                ? 'translateY(calc(-50vh + 50%))' // поднимаем в центр экрана
+                : 'translateY(0)')                 // на место внизу
+            : 'translateY(0)',                     // начальное состояние без анимации
+          transition: 'transform 500ms cubic-bezier(0.34, 1.2, 0.64, 1), max-width 500ms ease-out',
         }}
       >
         <InputArea />
