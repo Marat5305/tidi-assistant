@@ -1,7 +1,7 @@
 // src/components/chat/MessageFeedback.tsx
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { ThumbsUp, ThumbsDown, Share2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -22,6 +22,13 @@ export function MessageFeedback({ messageId, messageContent }: MessageFeedbackPr
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   // Текст кастомной причины и флаг, открыто ли поле ввода
   const [customReasonText, setCustomReasonText] = useState<string | null>(null);
+
+  // Отладка: логируем причину дизлайка при изменении
+  useEffect(() => {
+    if (feedbackReason) {
+      console.log(`Feedback reason for ${messageId}: ${feedbackReason}`);
+    }
+  }, [feedbackReason, messageId]);
 
   // ---------- Лайк ----------
   const handleLike = () => {

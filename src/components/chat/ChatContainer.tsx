@@ -1,17 +1,11 @@
 import { MessageList } from './MessageList';
 import { InputArea } from './InputArea';
 import { useChatStore } from '../../store/chatStore';
-import { useRef, useEffect, useState } from 'react';
+import { useRef} from 'react';
 
 export function ChatContainer() {
   const { messages, isMasterMode } = useChatStore();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [prevMode, setPrevMode] = useState(isMasterMode);
-  
-  // Опционально: синхронизация для анимации
-  useEffect(() => {
-    setPrevMode(isMasterMode);
-  }, [isMasterMode]);
   
   return (
     <div 
