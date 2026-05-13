@@ -37,7 +37,7 @@ const applyTheme = (theme: Theme): void => {
 export const useUIStore = create<UIStore>()(
   devtools(
     (set) => ({
-      isSidebarOpen: true,
+      isSidebarOpen: false,
       theme: 'system',
       activeModal: null,
       inputValue: '',

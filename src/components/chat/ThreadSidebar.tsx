@@ -3,7 +3,7 @@ import { useUIStore } from '../../store/uiStore';
 import { Menu, PanelLeftClose } from 'lucide-react';
 
 export function ThreadSidebar() {
-  const sidebarOpen = useUIStore((state) => state.sidebarOpen);
+  const sidebarOpen = useUIStore((state) => state.isSidebarOpen);
   const toggleSidebar = useUIStore((state) => state.toggleSidebar);
 
   return (

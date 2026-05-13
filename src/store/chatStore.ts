@@ -8,6 +8,7 @@ interface ChatState {
   threads: Thread[];
   activeThreadId: string | null;
   isStreaming: boolean;
+  isMasterMode: boolean;
   messages: Message[];
   streamingMessage: string;
   activeCitations: Citation[];
@@ -28,6 +29,7 @@ interface ChatActions {
   toggleCitationsPanel: () => void;
   setStreaming: (isStreaming: boolean) => void;
   setError: (error: string | null) => void;
+  sendMessage: (text: string) => void;
   clearMessages: () => void;
   pinThread: (threadId: string) => void;
 }
@@ -41,11 +43,19 @@ export const useChatStore = create<ChatStore>()(
       threads: [],
       activeThreadId: null,
       isStreaming: false,
-      messages: [],
+      messages: [{
+        id: '1',
+        role: 'assistant',
+        content: 'Привет! Я твой AI-помощник. Задай вопрос или загрузи файл.',
+      },],
       streamingMessage: '',
       activeCitations: [],
       showCitationsPanel: false,
       error: null,
+
+
+
+
 
       // Actions
       createThread: () => {
@@ -112,16 +122,44 @@ export const useChatStore = create<ChatStore>()(
             threads: state.threads.map((t) =>
               t.id === message.threadId
                 ? {
-                    ...t,
-                    messages: newMessages,
-                    lastMessage: message.content.slice(0, 100),
-                    updatedAt: Date.now(),
-                  }
+                  ...t,
+                  messages: newMessages,
+                  lastMessage: message.content.slice(0, 100),
+                  updatedAt: Date.now(),
+                }
                 : t
             ),
             error: null,
           };
         });
+      },
+
+      sendMessage: (text: string) => {
+        // Добавляем сообщение пользователя
+        const userMessage: Message = {
+          id: Date.now().toString(),
+          role: 'user',
+          content: text,
+          threadId: '',
+          timestamp: 0,
+          status: 'error'
+        };
+
+        set((state) => ({ messages: [...state.messages, userMessage] }));
+
+        // Имитация ответа бота (через полсекунды)
+        setTimeout(() => {
+          const botMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: `Ты написал: "${text}". Пока это заглушка, скоро здесь будет настоящий AI!`,
+            threadId: '',
+            timestamp: 0,
+            status: 'error'
+          };
+
+          set((state) => ({ messages: [...state.messages, botMessage] }));
+        }, 500);
       },
 
       updateMessage: (messageId: string, updates: Partial<Message>) => {
@@ -149,11 +187,11 @@ export const useChatStore = create<ChatStore>()(
             threads: state.threads.map((t) =>
               t.id === finalMessage.threadId
                 ? {
-                    ...t,
-                    messages: newMessages,
-                    lastMessage: finalMessage.content.slice(0, 100),
-                    updatedAt: Date.now(),
-                  }
+                  ...t,
+                  messages: newMessages,
+                  lastMessage: finalMessage.content.slice(0, 100),
+                  updatedAt: Date.now(),
+                }
                 : t
             ),
           };
