@@ -1,6 +1,6 @@
 import { useUIStore } from '../../store/uiStore';
 import { AGENTS } from '../../config/agents';
-import { User } from 'lucide-react';
+import { User, Settings, MessageCircle } from 'lucide-react';
 
 export function AgentSidebar() {
   const activeAgent = useUIStore((state) => state.activeAgent);
@@ -48,6 +48,29 @@ export function AgentSidebar() {
             </button>
           );
         })}
+      </div>
+      
+      {/* Нижние кнопки */}
+      <div className="mt-auto flex flex-col items-center gap-3 pb-4">
+        <button
+          className="flex flex-col items-center gap-1 p-2 rounded-xl text-gray-500 hover:bg-[var(--color-surface)] hover:text-[var(--color-accent)] transition-all hover:scale-105"
+          title="Настройки"
+        >
+          <Settings size={20} />
+          <span className="text-[10px] leading-tight text-center">
+            Настройки
+          </span>
+        </button>
+
+        <button
+          className="flex flex-col items-center gap-1 p-2 rounded-xl text-gray-500 hover:bg-[var(--color-surface)] hover:text-[var(--color-accent)] transition-all hover:scale-105"
+          title="Обратиться к разработчикам"
+        >
+          <MessageCircle size={20} />
+          <span className="text-[10px] leading-tight text-center">
+            Поддержка
+          </span>
+        </button>
       </div>
     </aside>
   );
