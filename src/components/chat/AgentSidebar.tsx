@@ -1,0 +1,54 @@
+import { useUIStore } from '../../store/uiStore';
+import { AGENTS } from '../../config/agents';
+import { User } from 'lucide-react';
+
+export function AgentSidebar() {
+  const activeAgent = useUIStore((state) => state.activeAgent);
+  const setActiveAgent = useUIStore((state) => state.setActiveAgent);
+
+  return (
+    <aside className="w-24 h-full flex flex-col items-center py-4 border-l border-[var(--color-accent)] bg-white dark:bg-gray-900">
+      {/* Профиль */}
+      <button className="flex flex-col items-center gap-1 mb-6 p-1 rounded-lg hover:bg-[var(--color-surface)] transition-colors">
+        <div className="w-10 h-10 rounded-full bg-[var(--color-surface)] border-2 border-[var(--color-accent)] flex items-center justify-center">
+          <User size={22} className="text-[var(--color-accent)]" />
+        </div>
+        <span className="text-[10px] text-gray-500 dark:text-gray-400 leading-tight text-center">
+          Профиль
+        </span>
+      </button>
+
+      {/* Разделитель */}
+      <div className="w-12 h-px bg-[var(--color-surface)] mb-4" />
+
+      {/* Агенты */}
+      <div className="flex flex-col gap-3">
+        {AGENTS.map((agent) => {
+          const isActive = activeAgent === agent.id;
+          const Icon = agent.icon;
+
+          return (
+            <button
+              key={agent.id}
+              onClick={() => setActiveAgent(isActive ? null : agent.id)}
+              className={`
+                flex flex-col items-center gap-1 p-2 rounded-xl transition-all
+                hover:scale-105
+                ${isActive
+                  ? 'bg-[var(--color-accent)] text-white shadow-md'
+                  : 'text-gray-500 hover:bg-[var(--color-surface)] hover:text-[var(--color-accent)]'
+                }
+              `}
+              title={agent.description}
+            >
+              <Icon size={22} />
+              <span className="text-[10px] leading-tight text-center">
+                {agent.name}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </aside>
+  );
+}
