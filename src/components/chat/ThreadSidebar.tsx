@@ -44,7 +44,7 @@ export function ThreadSidebar() {
               </div>
 
               <div className="text-sm text-gray-500">
-                <p>📁 Сегодня</p>
+                <p>Сегодня</p>
                 <p className="mt-2 p-2 bg-blue-100 dark:bg-blue-900 rounded">
                   Текущий диалог
                 </p>

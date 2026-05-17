@@ -65,12 +65,18 @@ export const useChatStore = create<ChatStore>((set) => ({
           title: 'Указания по делопроизводству',
           snippet: 'Рекомендации по оформлению служебных записок и работе с обращениями граждан.',
         },
+        {
+          id: 'c7',
+          number: 7,
+          title: 'Конституция РФ',
+          snippet: 'Записок и работе с обращениями граждан.',
+        },
       ];
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: `Ты написал: "${text}". Это AI ассистент! Согласно [citation:1], а также [citation:2] и [citation:3].`,
+        content: `Ты написал: "${text}". Согласно [citation:1], а также [citation:2], [citation:3], [citation:4], [citation:5], [citation:6], [citation:7]`,
         citations: mockCitations,
       };
       

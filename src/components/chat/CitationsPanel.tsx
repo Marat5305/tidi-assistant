@@ -50,13 +50,13 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
       <p className="text-xs text-gray-500 mb-2 font-medium">Источники:</p>
       
       {/* Контейнер с фейдами */}
-      <div className="relative">
+      <div className="relative overflow-hidden">
         {/* Левый градиентный фейд — появляется, когда есть что скроллить влево */}
         {showLeftFade && (
           <div 
             className="absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
             style={{
-              background: 'linear-gradient(to right, rgb(255 255 255 / 0.9), transparent)',
+              background: 'linear-gradient(to right, rgb(250 50 150 / 0.7), transparent)',
             }}
           />
         )}
@@ -66,7 +66,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
           <div 
             className="absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
             style={{
-              background: 'linear-gradient(to left, rgb(255 255 255 / 0.9), transparent)',
+              background: 'linear-gradient(to left, rgb(250 50 150 / 0.7), transparent)',
             }}
           />
         )}
@@ -74,7 +74,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
         {/* Скролл-контейнер с карточками */}
         <div 
           ref={scrollContainerRef}
-          className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scroll-smooth hide-scrollbar"
+          className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scroll-smooth thin-scrollbar"
         >
           {citations.map((citation) => {
             const isExpanded = expandedId === citation.id;
