@@ -1,5 +1,4 @@
 // src/components/chat/MessageItem.tsx
-import { useState } from 'react';
 import type { Message } from '../../types/chat';
 
 interface MessageItemProps {
