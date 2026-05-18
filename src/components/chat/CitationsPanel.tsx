@@ -56,7 +56,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
           <div 
             className="absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
             style={{
-              background: 'linear-gradient(to right, rgb(250 50 150 / 0.7), transparent)',
+              background: `linear-gradient(to right, color-mix(in srgb, var(--color-dark) 70%, transparent), transparent)`,
             }}
           />
         )}
@@ -66,7 +66,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
           <div 
             className="absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
             style={{
-              background: 'linear-gradient(to left, rgb(250 50 150 / 0.7), transparent)',
+              background: `linear-gradient(to left, color-mix(in srgb, var(--color-dark) 70%, transparent), transparent)`,
             }}
           />
         )}
@@ -118,7 +118,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
                 {isExpanded && (
                   <div className="p-2">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
                         <span className="flex-shrink-0 w-5 h-5 rounded bg-[var(--color-accent)]/10 text-[var(--color-accent)] text-xs font-bold flex items-center justify-center">
                           {citation.number}
                         </span>

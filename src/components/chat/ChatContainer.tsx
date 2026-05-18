@@ -18,7 +18,7 @@ export function ChatContainer() {
   return (
     <div 
       ref={containerRef}
-      className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 mx-auto relative w-[90%] max-w-[900px]"
+      className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 mx-auto relative w-[90%] max-w-[1200px]"
     >
       {/* Список сообщений - с плавным появлением/исчезновением */}
       <div 
