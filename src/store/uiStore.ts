@@ -1,7 +1,7 @@
-// src/store/uiStore.ts
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
+<<<<<<< HEAD
 type Theme = 'light' | 'dark' | 'system';
 
 interface UIState {
@@ -96,3 +96,18 @@ if (typeof window !== 'undefined') {
       }
     });
 }
+=======
+interface UIStore {
+  sidebarOpen: boolean;
+  toggleSidebar: () => void;
+  activeAgent: string | null;
+  setActiveAgent: (agentId: string | null) => void;
+}
+
+export const useUIStore = create<UIStore>((set) => ({
+  sidebarOpen: false,
+  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+  activeAgent: null,
+  setActiveAgent: (agentId) => set({ activeAgent: agentId }),
+}));
+>>>>>>> a4f90794be3158caa02ff866192b848283b5196f

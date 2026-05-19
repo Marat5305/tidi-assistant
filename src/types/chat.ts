@@ -18,12 +18,21 @@ export interface FileAttachment {
   progress: number;
 }
 
+export interface Citation {
+  id: string;
+  number: number;
+  title: string;
+  url?: string;
+  snippet: string;
+}
+
 export interface Message {
   id: string;
   threadId: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
   citations?: Citation[];
+<<<<<<< HEAD
   attachments?: FileAttachment[];
   timestamp: number;
   status: 'sending' | 'sent' | 'streaming' | 'error';
@@ -75,4 +84,6 @@ export interface VirtualScrollData {
 export interface StreamParserResult {
   chunks: StreamChunk[];
   remainingBuffer: string;
+=======
+>>>>>>> a4f90794be3158caa02ff866192b848283b5196f
 }

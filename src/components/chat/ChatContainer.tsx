@@ -2,6 +2,7 @@ import { MessageList } from './MessageList';
 import { InputArea } from './InputArea';
 import { useChatStore } from '../../store/chatStore';
 import { useRef, useEffect, useState } from 'react';
+import { FileDropZone } from './FileDropZone';
 
 export function ChatContainer() {
   const { messages, isMasterMode } = useChatStore();
@@ -17,7 +18,7 @@ export function ChatContainer() {
   return (
     <div 
       ref={containerRef}
-      className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 mx-auto relative w-[90%] max-w-[900px]"
+      className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 mx-auto relative w-[90%] max-w-[1200px]"
     >
       {/* Список сообщений - с плавным появлением/исчезновением */}
       <div 
@@ -50,7 +51,9 @@ export function ChatContainer() {
           transition: 'transform 500ms cubic-bezier(0.34, 1.2, 0.64, 1), max-width 500ms ease-out',
         }}
       >
-        <InputArea />
+        <FileDropZone>
+          <InputArea />
+        </FileDropZone>
       </div>
     </div>
   );
