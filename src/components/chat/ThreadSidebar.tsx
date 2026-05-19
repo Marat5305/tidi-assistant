@@ -1,6 +1,6 @@
 // src/components/chat/ThreadSidebar.tsx
 import { useUIStore } from '../../store/uiStore';
-import { Menu, PanelLeftClose } from 'lucide-react';
+import { Menu, PanelLeftClose, Search, Plus } from 'lucide-react';
 
 export function ThreadSidebar() {
   const sidebarOpen = useUIStore((state) => state.isSidebarOpen);
@@ -34,17 +34,30 @@ export function ThreadSidebar() {
             <aside className="bg-[var(--color-surface)] p-4 flex flex-col h-full">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="font-bold">История</h2>
-                <button
-                  onClick={toggleSidebar}
-                  className="text-gray-500 hover:text-[var(--color-accent)] transition-colors"
-                  aria-label="Свернуть сайдбар"
-                >
-                  <PanelLeftClose size={20} />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    className="p-1.5 rounded-md text-gray-500 hover:text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-colors"
+                    aria-label="Поиск по истории"
+                  >
+                    <Search size={18} />
+                  </button>
+                  <button
+                    onClick={toggleSidebar}
+                    className="p-1.5 rounded-md text-gray-500 hover:text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-colors"
+                    aria-label="Свернуть сайдбар"
+                  >
+                    <PanelLeftClose size={18} />
+                  </button>
+                </div>
               </div>
 
+              <button className="w-full mb-4 px-3 py-2 flex items-center gap-2 text-sm rounded-lg shadow-sm border border-gray-200 text-gray-500 hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:shadow-md transition-all">
+                <Plus size={16} />
+                Новый чат
+              </button>
+
               <div className="text-sm text-gray-500">
-                <p>📁 Сегодня</p>
+                <p>Сегодня</p>
                 <p className="mt-2 p-2 bg-blue-100 dark:bg-blue-900 rounded">
                   Текущий диалог
                 </p>

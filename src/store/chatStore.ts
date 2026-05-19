@@ -8,12 +8,12 @@ interface ChatState {
   threads: Thread[];
   activeThreadId: string | null;
   isStreaming: boolean;
-  isMasterMode: boolean;
   messages: Message[];
   streamingMessage: string;
   activeCitations: Citation[];
   showCitationsPanel: boolean;
   error: string | null;
+  isMasterMode: boolean;
 }
 
 interface ChatActions {
@@ -29,9 +29,10 @@ interface ChatActions {
   toggleCitationsPanel: () => void;
   setStreaming: (isStreaming: boolean) => void;
   setError: (error: string | null) => void;
-  sendMessage: (text: string) => void;
   clearMessages: () => void;
   pinThread: (threadId: string) => void;
+  sendMessage: (text: string) => void;
+  setMasterMode: (enabled: boolean) => void;
 }
 
 type ChatStore = ChatState & ChatActions;
@@ -52,6 +53,7 @@ export const useChatStore = create<ChatStore>()(
       activeCitations: [],
       showCitationsPanel: false,
       error: null,
+      isMasterMode: true,
 
 
 
@@ -134,34 +136,6 @@ export const useChatStore = create<ChatStore>()(
         });
       },
 
-      sendMessage: (text: string) => {
-        // Добавляем сообщение пользователя
-        const userMessage: Message = {
-          id: Date.now().toString(),
-          role: 'user',
-          content: text,
-          threadId: '',
-          timestamp: 0,
-          status: 'error'
-        };
-
-        set((state) => ({ messages: [...state.messages, userMessage] }));
-
-        // Имитация ответа бота (через полсекунды)
-        setTimeout(() => {
-          const botMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            role: 'assistant',
-            content: `Ты написал: "${text}". Пока это заглушка, скоро здесь будет настоящий AI!`,
-            threadId: '',
-            timestamp: 0,
-            status: 'error'
-          };
-
-          set((state) => ({ messages: [...state.messages, botMessage] }));
-        }, 500);
-      },
-
       updateMessage: (messageId: string, updates: Partial<Message>) => {
         set((state) => ({
           messages: state.messages.map((m) =>
@@ -227,6 +201,107 @@ export const useChatStore = create<ChatStore>()(
           ),
         }));
       },
+
+      sendMessage: (text: string) => {
+        const userMessage: Message = {
+          id: Date.now().toString(),
+          role: 'user',
+          content: text,
+          threadId: get().activeThreadId || undefined || '',
+          timestamp: 0,
+          status: 'error'
+        };
+
+        set((state) => ({
+          messages: [...state.messages, userMessage],
+          isMasterMode: false,
+        }));
+
+        // Имитация ответа
+        setTimeout(() => {
+          const mockCitations: Citation[] = [
+            {
+              id: 'c1',
+              number: 1,
+              title: 'ГОСТ Р 7.0.97-2016',
+              snippet: 'Система стандартов по информации, библиотечному и издательскому делу. Организационно-распорядительная документация.',
+              url: 'https://protect.gost.ru/document.aspx?control=7&id=123456',
+              text: '',
+              source: '',
+              relevanceScore: 0
+            },
+            {
+              id: 'c2',
+              number: 2,
+              title: 'Регламент электронного документооборота',
+              snippet: 'Порядок обработки входящих документов и распределения по исполнителям в течение 24 часов.',
+              text: '',
+              source: '',
+              relevanceScore: 0
+            },
+            {
+              id: 'c3',
+              number: 3,
+              title: 'Методические указания по делопроизводству',
+              snippet: 'Рекомендации по оформлению служебных записок и работе с обращениями граждан.',
+              text: '',
+              source: '',
+              relevanceScore: 0
+            },
+            {
+              id: 'c4',
+              number: 4,
+              title: 'ГОСТ Р 7.0.97-2016',
+              snippet: 'Библиотечное и издательское дело. Организационно-распорядительная документация.',
+              url: 'https://protect.gost.ru/document.aspx?control=7&id=123456',
+              text: '',
+              source: '',
+              relevanceScore: 0
+            },
+            {
+              id: 'c5',
+              number: 5,
+              title: 'Перечень электронного документооборота',
+              snippet: 'Порядок обработки входящих документов и распределения по исполнителям в течение 24 часов.',
+              text: '',
+              source: '',
+              relevanceScore: 0
+            },
+            {
+              id: 'c6',
+              number: 6,
+              title: 'Указания по делопроизводству',
+              snippet: 'Рекомендации по оформлению служебных записок и работе с обращениями граждан.',
+              text: '',
+              source: '',
+              relevanceScore: 0
+            },
+            {
+              id: 'c7',
+              number: 7,
+              title: 'Конституция РФ',
+              snippet: 'Записок и работе с обращениями граждан.',
+              text: '',
+              source: '',
+              relevanceScore: 0
+            },
+          ];
+
+          const botMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: `Ты написал: "${text}". Согласно [citation:1], а также [citation:2], [citation:3], [citation:4], [citation:5], [citation:6], [citation:7]`,
+            citations: mockCitations,
+            threadId: get().activeThreadId || undefined || '',
+            timestamp: 0,
+            status: 'error'
+          };
+
+          set((state) => ({ messages: [...state.messages, botMessage] }));
+        }, 500);
+      },
+
+      setMasterMode: (enabled: boolean) => set({ isMasterMode: enabled }),
     }),
     { name: 'chat-store' }
   )

@@ -20,6 +20,32 @@
   }
 }
 
+/* Тонкий стилизованный скроллбар */
+.thin-scrollbar {
+  /* Firefox: тонкий скроллбар */
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-accent) 30%, transparent) transparent;
+}
+
+/* Chrome, Safari, Edge */
+.thin-scrollbar::-webkit-scrollbar {
+  height: 4px; /* для горизонтального скролла */
+  width: 4px;  /* на всякий случай, если будет и вертикальный */
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  border-radius: 4px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-accent) 60%, transparent);
+}
+
 @layer utilities {
   /* Светлая тема */
   .bg-chat-glow-light {
