@@ -1,4 +1,3 @@
-// src/store/uiStore.ts
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
@@ -10,6 +9,8 @@ interface UIState {
   activeModal: string | null;
   inputValue: string;
   isLoading: boolean;
+  activeAgent: string | null;
+
 }
 
 interface UIActions {
@@ -21,6 +22,8 @@ interface UIActions {
   setInputValue: (value: string) => void;
   setLoading: (loading: boolean) => void;
   resetUI: () => void;
+  sidebarOpen: boolean;
+  setActiveAgent: (agentId: string | null) => void;
 }
 
 type UIStore = UIState & UIActions;
@@ -42,10 +45,10 @@ export const useUIStore = create<UIStore>()(
       activeModal: null,
       inputValue: '',
       isLoading: false,
-
-      toggleSidebar: () => {
-        set((state) => ({ isSidebarOpen: !state.isSidebarOpen }));
-      },
+      sidebarOpen: false,
+      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+      activeAgent: null,
+      setActiveAgent: (agentId) => set({ activeAgent: agentId }),
 
       setSidebarOpen: (open: boolean) => {
         set({ isSidebarOpen: open });
@@ -96,3 +99,4 @@ if (typeof window !== 'undefined') {
       }
     });
 }
+
