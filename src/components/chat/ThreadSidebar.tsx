@@ -1,6 +1,7 @@
 // src/components/chat/ThreadSidebar.tsx
 import { useUIStore } from '../../store/uiStore';
 import { Menu, PanelLeftClose, Search, Plus } from 'lucide-react';
+import logo from '../../assets/logo.svg';
 
 export function ThreadSidebar() {
   const sidebarOpen = useUIStore((state) => state.sidebarOpen);
@@ -24,17 +25,20 @@ export function ThreadSidebar() {
       {/* Обёртка с анимируемой шириной */}
       <div
         className={`
-          overflow-hidden transition-all duration-300 ease-out
+          overflow-hidden transition-all duration-300 ease-out h-full
           ${sidebarOpen ? 'w-64 border-r border-[var(--color-accent)]' : 'w-0 border-r-0'}
         `}
       >
         {/* Внутренний контейнер фиксированной ширины — чтобы контент не схлопывался */}
-        <div className="w-64">
+        <div className="w-64 h-full">
           {sidebarOpen && (
             <aside className="bg-[var(--color-surface)] p-4 flex flex-col h-full">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="font-bold">История</h2>
-                <div className="flex items-center gap-1">
+              <div className="flex justify-between items-end mb-4">
+                <div className="flex gap-1 items-end">
+                  <img src={logo} alt="Логотип" className="fill-[var(--color-surface)] h-8 w-auto" />
+                  <h2 className="text-2xl font-bold italic tracking-wide text-gradient-logo">тиди</h2>
+                </div>
+                <div className="flex items-end gap-1">
                   <button
                     className="p-1.5 rounded-md text-gray-500 hover:text-[var(--color-accent)] hover:bg-[var(--color-accent)]/10 transition-colors"
                     aria-label="Поиск по истории"
@@ -58,7 +62,7 @@ export function ThreadSidebar() {
 
               <div className="text-sm text-gray-500">
                 <p>Сегодня</p>
-                <p className="mt-2 p-2 bg-blue-100 dark:bg-blue-900 rounded">
+                <p className="mt-2 p-2 bg-[var(--color-accent)]/15 dark:bg-blue-900 rounded">
                   Текущий диалог
                 </p>
                 <p className="mt-1 p-2">Предыдущий чат</p>
