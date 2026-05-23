@@ -8,7 +8,6 @@ import { generateId } from '../../utils/id';
  */
 export function DevThreadCreator() {
   const threads = useChatStore((state) => state.threads);
-  const setActiveThread = useChatStore((state) => state.setActiveThread);
   
   // Только в development режиме
   if (import.meta.env.MODE !== 'development') {

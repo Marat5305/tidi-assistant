@@ -1,7 +1,7 @@
 // src/components/chat/ThreadSidebar.tsx
 import { useChatStore } from '../../store/chatStore';
 import { useUIStore } from '../../store/uiStore';
-import { Menu, PanelLeftClose, Search, Plus } from 'lucide-react';
+import { Menu, PanelLeftClose, Search, Plus, Trash2 } from 'lucide-react';
 import { groupThreadsByDate } from '../../utils/threadGrouping';
 import logo from '../../assets/logo.svg';
 
@@ -14,6 +14,7 @@ export function ThreadSidebar() {
   const activeThreadId = useChatStore((state) => state.activeThreadId);
   const createThread = useChatStore((state) => state.createThread);
   const setActiveThread = useChatStore((state) => state.setActiveThread);
+  const deleteThread = useChatStore((state) => state.deleteThread);
 
   // Группируем треды по датам
   const threadGroups = groupThreadsByDate(threads);
@@ -21,6 +22,16 @@ export function ThreadSidebar() {
   // Обработчик создания нового чата
   const handleNewChat = () => {
     createThread();
+  };
+
+  // Обработчик удаления треда
+  const handleDeleteThread = (e: React.MouseEvent, threadId: string, threadTitle: string) => {
+    e.stopPropagation(); // Останавливаем всплытие, чтобы не сработал onClick родителя
+    
+    const confirmed = window.confirm(`Удалить чат "${threadTitle}"?`);
+    if (confirmed) {
+      deleteThread(threadId);
+    }
   };
 
   return (
@@ -95,21 +106,40 @@ export function ThreadSidebar() {
                           key={thread.id}
                           onClick={() => setActiveThread(thread.id)}
                           className={`
-                            px-3 py-2 rounded-lg cursor-pointer transition-colors
+                            group relative px-3 py-2 rounded-lg cursor-pointer transition-all
                             ${activeThreadId === thread.id 
                               ? 'bg-[var(--color-accent)]/15 dark:bg-blue-900/50' 
                               : 'hover:bg-gray-100 dark:hover:bg-gray-800'
                             }
                           `}
                         >
-                          <div className="text-sm font-medium truncate">
-                            {thread.title}
-                          </div>
-                          {thread.lastMessage && (
-                            <div className="text-xs text-gray-500 truncate mt-0.5">
-                              {thread.lastMessage}
+                          <div className="flex items-center justify-between gap-2">
+                            {/* Контент треда */}
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium truncate">
+                                {thread.title}
+                              </div>
+                              {thread.lastMessage && (
+                                <div className="text-xs text-gray-500 truncate mt-0.5">
+                                  {thread.lastMessage}
+                                </div>
+                              )}
                             </div>
-                          )}
+                            
+                            {/* Кнопка удаления - появляется при наведении на тред */}
+                            <button
+                              onClick={(e) => handleDeleteThread(e, thread.id, thread.title)}
+                              className={`
+                                opacity-0 group-hover:opacity-100 transition-opacity
+                                p-1 rounded-md text-gray-400 hover:text-red-500 
+                                hover:bg-red-50 dark:hover:bg-red-900/20
+                                flex-shrink-0
+                              `}
+                              aria-label="Удалить чат"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
