@@ -10,7 +10,7 @@ function App() {
       <ThreadSidebar />
       <ChatContainer />
       <AgentSidebar />
-      // Удалить перед продакшеном
+      {/* Удалить перед продакшеном */}
       <DevThreadCreator />
     </div>
   );

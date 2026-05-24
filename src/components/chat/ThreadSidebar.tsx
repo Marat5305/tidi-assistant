@@ -1,8 +1,10 @@
 // src/components/chat/ThreadSidebar.tsx
+import { useState } from 'react';
 import { useChatStore } from '../../store/chatStore';
 import { useUIStore } from '../../store/uiStore';
 import { Menu, PanelLeftClose, Search, Plus, Trash2 } from 'lucide-react';
 import { groupThreadsByDate } from '../../utils/threadGrouping';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import logo from '../../assets/logo.svg';
 
 export function ThreadSidebar() {
@@ -16,6 +18,9 @@ export function ThreadSidebar() {
   const setActiveThread = useChatStore((state) => state.setActiveThread);
   const deleteThread = useChatStore((state) => state.deleteThread);
 
+  // Состояние для модалки удаления
+  const [threadToDelete, setThreadToDelete] = useState<{ id: string; title: string } | null>(null);
+
   // Группируем треды по датам
   const threadGroups = groupThreadsByDate(threads);
 
@@ -24,17 +29,27 @@ export function ThreadSidebar() {
     createThread();
   };
 
-  // Обработчик удаления треда
-  const handleDeleteThread = (e: React.MouseEvent, threadId: string, threadTitle: string) => {
+  // Обработчик открытия модалки удаления
+  const handleDeleteClick = (e: React.MouseEvent, threadId: string, threadTitle: string) => {
     e.stopPropagation(); // Останавливаем всплытие, чтобы не сработал onClick родителя
-    
-    const confirmed = window.confirm(`Удалить чат "${threadTitle}"?`);
-    if (confirmed) {
-      deleteThread(threadId);
+    setThreadToDelete({ id: threadId, title: threadTitle });
+  };
+
+  // Обработчик подтверждения удаления
+  const handleConfirmDelete = () => {
+    if (threadToDelete) {
+      deleteThread(threadToDelete.id);
+      setThreadToDelete(null); // Закрываем модалку
     }
   };
 
+  // Обработчик закрытия модалки (без удаления)
+  const handleCloseDialog = () => {
+    setThreadToDelete(null);
+  };
+
   return (
+    <>
     <div className="relative flex h-full">
       {/* Кнопка открытия — видна только когда сайдбар закрыт */}
       {!sidebarOpen && (
@@ -128,7 +143,7 @@ export function ThreadSidebar() {
                             
                             {/* Кнопка удаления - появляется при наведении на тред */}
                             <button
-                              onClick={(e) => handleDeleteThread(e, thread.id, thread.title)}
+                              onClick={(e) => handleDeleteClick(e, thread.id, thread.title)}
                               className={`
                                 opacity-0 group-hover:opacity-100 transition-opacity
                                 p-1 rounded-md text-gray-400 hover:text-red-500 
@@ -160,5 +175,17 @@ export function ThreadSidebar() {
         </div>
       </div>
     </div>
+    {/* 👈 Модалка подтверждения удаления */}
+      <ConfirmDialog
+        isOpen={threadToDelete !== null}
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirmDelete}
+        title="Удалить чат?"
+        description={`Вы уверены, что хотите удалить чат "${threadToDelete?.title}"? Это действие нельзя отменить.`}
+        confirmText="Удалить"
+        cancelText="Отмена"
+        confirmVariant="danger"
+      />
+      </>
   );
 }
