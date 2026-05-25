@@ -36,6 +36,7 @@ export interface Message {
   timestamp: number;
   status: 'sending' | 'sent' | 'streaming' | 'error';
   tokenCount?: number;
+  suggestions?: SuggestionAction[];
 }
 
 export interface Thread {
@@ -83,4 +84,11 @@ export interface VirtualScrollData {
 export interface StreamParserResult {
   chunks: StreamChunk[];
   remainingBuffer: string;
+}
+
+// Тип для кнопки-подсказки
+export interface SuggestionAction {
+  id: string;
+  label: string;      // Текст на кнопке, например "Разверни подробнее"
+  prompt: string;     // Что отправить при клике, например "Разверни, пожалуйста, подробнее этот ответ"
 }

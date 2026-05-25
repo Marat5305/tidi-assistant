@@ -1,3 +1,4 @@
+// src/components/chat/ChatContainer.tsx
 import { MessageList } from './MessageList';
 import { InputArea } from './InputArea';
 import { useChatStore } from '../../store/chatStore';

@@ -1,3 +1,4 @@
+// src/components/chat/AgentSidebar.tsx
 import { useUIStore } from '../../store/uiStore';
 import { AGENTS } from '../../config/agents';
 import { User, Settings, MessageCircle } from 'lucide-react';
