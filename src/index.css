@@ -95,3 +95,10 @@
   animation: borderGlow 1.5s ease-in-out infinite;
   border-color: #0abab5;
 }
+
+.text-gradient-logo {
+  background: linear-gradient(90deg, #2b2b2b, #0abab5);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}

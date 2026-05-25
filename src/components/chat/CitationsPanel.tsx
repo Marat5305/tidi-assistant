@@ -42,6 +42,26 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
     }
   }, [citations]);
 
+  // ========== АВТОСКРОЛЛ К АКТИВНОЙ ЦИТАТЕ ==========
+  useEffect(() => {
+    // Если нет активной цитаты — выходим, ничего не делаем
+    if (!activeCitationId) return;
+    
+    // Ищем карточку с нужным data-атрибутом
+    const activeCard = scrollContainerRef.current?.querySelector(
+      `[data-citation-id="${activeCitationId}"]`
+    );
+    
+    // Если карточка найдена — скроллим к ней
+    if (activeCard) {
+      activeCard.scrollIntoView({
+        behavior: 'smooth',   // плавная анимация
+        block: 'nearest',     // минимальное движение (не дергаем, если видна)
+        inline: 'center'      // центрируем по горизонтали (красиво)
+      });
+    }
+  }, [activeCitationId]); // Срабатывает при КАЖДОМ изменении activeCitationId
+
   // Если нет цитат — ничего не рендерим
   if (!citations || citations.length === 0) return null;
 
@@ -51,7 +71,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
       
       {/* Контейнер с фейдами */}
       <div className="relative overflow-hidden">
-        {/* Левый градиентный фейд — появляется, когда есть что скроллить влево */}
+        {/* Левый градиентный фейд */}
         {showLeftFade && (
           <div 
             className="absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
@@ -61,7 +81,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
           />
         )}
         
-        {/* Правый градиентный фейд — появляется, когда есть что скроллить вправо */}
+        {/* Правый градиентный фейд */}
         {showRightFade && (
           <div 
             className="absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none"
@@ -74,7 +94,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
         {/* Скролл-контейнер с карточками */}
         <div 
           ref={scrollContainerRef}
-          className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 scroll-smooth thin-scrollbar"
+          className="flex items-start gap-2 overflow-x-auto pb-2 -mx-1 px-1 scroll-smooth thin-scrollbar"
         >
           {citations.map((citation) => {
             const isExpanded = expandedId === citation.id;
@@ -83,6 +103,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
             return (
               <div
                 key={citation.id}
+                data-citation-id={citation.id}
                 onClick={() => onCitationClick?.(citation.id)}
                 className={`
                   flex-shrink-0 rounded-lg border transition-all duration-200
@@ -94,10 +115,12 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
                   ${isExpanded ? 'w-64' : 'w-40'}
                 `}
               >
-                {/* Компактный вид (карточка не развёрнута) */}
+                {/* Компактный вид */}
                 {!isExpanded && (
                   <button
-                    onClick={() => setExpandedId(citation.id)}
+                    onClick={() => {
+                      setExpandedId(citation.id);
+                    }}
                     className="w-full p-2 text-left"
                   >
                     <div className="flex items-center gap-1.5 mb-1">
@@ -114,7 +137,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
                   </button>
                 )}
 
-                {/* Развёрнутый вид (показываем полный текст) */}
+                {/* Развёрнутый вид */}
                 {isExpanded && (
                   <div className="p-2">
                     <div className="flex items-center justify-between mb-2">
@@ -127,7 +150,10 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
                         </span>
                       </div>
                       <button
-                        onClick={() => setExpandedId(null)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // останавливаем всплытие
+                          setExpandedId(null);
+                        }}
                         className="text-gray-400 hover:text-gray-600"
                       >
                         <ChevronRight size={14} className="rotate-90" />
@@ -143,6 +169,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
                         href={citation.url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()} // ← НОВЫЙ КОД
                         className="inline-flex items-center gap-1 text-[11px] text-[var(--color-accent)] hover:text-[var(--color-hover)]"
                       >
                         <ExternalLink size={12} />
