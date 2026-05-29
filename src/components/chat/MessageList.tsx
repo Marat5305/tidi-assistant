@@ -52,7 +52,7 @@ export function MessageList() {
   }, [messages]);
   
   return (
-    <div className="flex-1 p-4 space-y-3">
+    <div className="flex-1 overflow-y-auto py-4 px-6 space-y-3">
       {messages.map((message) => (
         <div key={message.id}>
           <MessageItem 

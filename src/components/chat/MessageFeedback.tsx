@@ -81,7 +81,7 @@ export function MessageFeedback({ messageId, messageContent }: MessageFeedbackPr
   };
 
   return (
-    <div className="flex items-center gap-2 mt-2 mx-4">
+    <div className="flex items-center gap-2 mt-2 mx-6">
       {/* ---------- Лайк ---------- */}
       <Tooltip.Provider>
         <Tooltip.Root delayDuration={200}>

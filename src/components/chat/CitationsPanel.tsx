@@ -66,7 +66,7 @@ export function CitationsPanel({ citations, activeCitationId, onCitationClick }:
   if (!citations || citations.length === 0) return null;
 
   return (
-    <div className="mt-3 mx-4">
+    <div className="mt-3 mx-6">
       <p className="text-xs text-gray-500 mb-2 font-medium">Источники:</p>
 
       <div className="flex items-center gap-2 -mx-8">

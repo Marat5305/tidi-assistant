@@ -47,10 +47,10 @@ export function MessageItem({ message, onCitationClick, activeCitationId }: Mess
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
       <div
         className={`
-          max-w-[70%] rounded-lg px-4 py-2 border 
+          max-w-[70%] rounded-lg px-4 py-2 mx-6 border 
           ${isUser 
             ? 'bg-[var(--color-surface)] border-[var(--color-accent)] text-black' 
-            : 'bg-white dark:bg-gray-700 border-[var(--color-surface)] text-gray-900 dark:text-white'
+            : 'bg-white dark:bg-gray-700 border-[var(--color-surface)] shadow-sm text-gray-900 dark:text-white'
           }
         `}
       >
