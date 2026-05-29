@@ -24,7 +24,7 @@ export function ChatContainer() {
       {/* Список сообщений - с плавным появлением/исчезновением */}
       <div 
         className={`
-          flex-1 overflow-y-auto transition-all duration-500 ease-out
+          flex-1 transition-all duration-500 ease-out
           ${isMasterMode ? 'opacity-0 invisible' : 'opacity-100 visible'}
         `}
         style={{

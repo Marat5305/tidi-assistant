@@ -12,7 +12,7 @@ export function SuggestionButtons({ suggestions, onSuggestionClick }: Suggestion
   }
 
   return (
-    <div className="flex flex-wrap gap-2 mt-2 ms-4">
+    <div className="flex flex-wrap gap-2 mt-2 mx-4">
       {suggestions.map((suggestion) => (
         <button
           key={suggestion.id}
