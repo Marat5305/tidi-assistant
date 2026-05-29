@@ -102,3 +102,17 @@
   -webkit-background-clip: text;
   color: transparent;
 }
+
+/* Градиентная полоса загрузки */
+.loading-gradient {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #0abab5,
+    #2b2b2b,
+    #0abab5,
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: gradientFlow 2s ease-in-out infinite;
+}

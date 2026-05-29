@@ -6,7 +6,7 @@ import { useRef, useEffect, useState } from 'react';
 import { FileDropZone } from './FileDropZone';
 
 export function ChatContainer() {
-  const { messages, isMasterMode } = useChatStore();
+  const { messages, isMasterMode, isStreaming  } = useChatStore();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Реф на контейнер поля ввода — нужен, чтобы браузер не кэшировал начальный transform при первом рендере
@@ -33,6 +33,13 @@ export function ChatContainer() {
       >
         {!isMasterMode && messages.length > 0 && <MessageList />}
       </div>
+
+      {/* Прелоадер - градиентная полоса */}
+      {isStreaming && (
+        <div className="relative h-[3px] w-full overflow-hidden rounded-lg">
+          <div className="absolute inset-0 loading-gradient" />
+        </div>
+      )}
       
       {/* Контейнер с полем ввода */}
       <div 

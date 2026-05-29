@@ -207,6 +207,7 @@ export const useChatStore = create<ChatStore>()(
         set((state) => ({ 
           messages: [...state.messages, userMessage],
           isMasterMode: false,
+          isStreaming: true,
         }));
         
         // Имитация ответа
@@ -289,8 +290,11 @@ export const useChatStore = create<ChatStore>()(
             status: 'error'
           };
           
-          set((state) => ({ messages: [...state.messages, botMessage] }));
-        }, 500);
+          set((state) => ({
+            messages: [...state.messages, botMessage],
+            isStreaming: false,
+           }));
+        }, 2500);
       },
       
       setMasterMode: (enabled: boolean) => set({ isMasterMode: enabled }),
