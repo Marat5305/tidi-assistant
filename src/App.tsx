@@ -2,7 +2,7 @@
 import { ThreadSidebar } from './components/chat/ThreadSidebar';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { AgentSidebar } from './components/chat/AgentSidebar';
-import { DevThreadCreator } from './components/dev/DevThreadCreator';
+// import { DevThreadCreator } from './components/dev/DevThreadCreator';
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
       <ChatContainer />
       <AgentSidebar />
       {/* Удалить перед продакшеном */}
-      <DevThreadCreator />
+      {/* <DevThreadCreator /> */}
     </div>
   );
 }
