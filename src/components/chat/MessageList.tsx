@@ -55,13 +55,13 @@ export function MessageList({ bottomRef }: MessageListProps) {
           />
           {!isMasterMode && message.role === 'assistant' && (
             <>
-              <MessageFeedback 
-                messageId={message.id} 
-                messageContent={message.content} 
-              />
               <SuggestionButtons 
                 suggestions={getDefaultSuggestions()}
                 onSuggestionClick={handleSuggestionClick}
+              />
+              <MessageFeedback 
+                messageId={message.id} 
+                messageContent={message.content} 
               />
               {message.citations && message.citations.length > 0 && (
                 <CitationsPanel 
