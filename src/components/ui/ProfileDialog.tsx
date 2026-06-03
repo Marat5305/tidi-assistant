@@ -17,24 +17,29 @@ interface ProfileFormData {
 }
 
 export function ProfileDialog({ isOpen, onClose }: ProfileDialogProps) {
-    const user = useUserStore((state) => state.user);
-    const updateUser = useUserStore((state) => state.updateUser);
-    
-    // Локальный state для формы (чтобы не менять стор при каждом нажатии клавиши)
-    const [formData, setFormData] = useState<ProfileFormData>({
-        name: user.name,
-        email: user.email,
-        department: user.department,
-    });
+  const user = useUserStore((state) => state.user);
+  const updateUser = useUserStore((state) => state.updateUser);
+  
+  const [formData, setFormData] = useState<ProfileFormData>({
+    name: user?.name || '',
+    email: user?.email || '',
+    department: user?.department || '',
+  });
 
-    // При открытии модалки синхронизируем форму с актуальными данными из стора
-    useEffect(() => {
-        setFormData({
+  // Если пользователя нет — не рисуем модалку
+  if (!user) {
+    return null;
+  }
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
         name: user.name,
         email: user.email,
         department: user.department,
-        });
-    }, [user, isOpen]); // когда открывается модалка или меняется пользователь
+      });
+    }
+  }, [user, isOpen]); // когда открывается модалка или меняется пользователь
 
     const handleSave = () => {
         updateUser(formData); // сохраняем в стор

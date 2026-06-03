@@ -11,7 +11,7 @@ interface User {
 }
 
 interface UserState {
-  user: User;
+  user: User | null;
   isLoaded: boolean; // загружены ли данные (для индикатора загрузки)
 }
 
@@ -23,39 +23,25 @@ interface UserActions {
 
 type UserStore = UserState & UserActions;
 
-// Начальные данные (потом заменим на загрузку с API)
-const defaultUser: User = {
-  name: 'Анна Иванова',
-  email: 'anna@tidi.ai',
-  department: 'Отдел разработки',
-};
-
 export const useUserStore = create<UserStore>()(
   devtools(
     (set) => ({
-      // Начальное состояние
-      user: defaultUser,
+      // Начальное состояние — пользователь не залогинен
+      user: null,  // ← теперь null
       isLoaded: false,
 
-      // Обновление пользователя (частичное)
       updateUser: (updates) =>
         set((state) => ({
-          user: { ...state.user, ...updates },
+          user: state.user ? { ...state.user, ...updates } : { ...updates } as User,
         })),
 
-      // Загрузка данных с сервера (пока заглушка)
       loadUser: async () => {
-        // TODO: заменить на реальный API-запрос
-        // const response = await api.getUser();
-        // set({ user: response.data, isLoaded: true });
-        
-        // Пока просто имитируем задержку
+        // Заглушка — пока ничего не загружаем
         await new Promise(resolve => setTimeout(resolve, 500));
         set({ isLoaded: true });
       },
 
-      // Сброс к значениям по умолчанию (при выходе из аккаунта)
-      resetUser: () => set({ user: defaultUser, isLoaded: false }),
+      resetUser: () => set({ user: null, isLoaded: false }),  // ← теперь null
     }),
     { name: 'user-store' }
   )
