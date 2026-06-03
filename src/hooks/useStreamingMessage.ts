@@ -2,173 +2,215 @@
 import { useCallback, useRef } from 'react';
 import { useChatStore } from '../store/chatStore';
 import { useUIStore } from '../store/uiStore';
-import { streamChat } from '../services/api';
+import { apiClient } from '../services/api';
 import { StreamParser } from '../services/streamParser';
-import type { Message, ChatRequest, Citation } from '../types/chat';
-import { generateId } from '../utils/id';
+import type { 
+  StreamChunk, 
+  Citation, 
+  Message,
+  BackendChunk,
+  // BackendMessage
+} from '../types/chat';
+import { 
+  convertBackendChunkToCitation,
+  createOptimisticUserMessage,
+  createStreamingAssistantMessage 
+} from '../types/chat';
+// import { generateId } from '../utils/id';
 
 export function useStreamingMessage() {
   const abortControllerRef = useRef<AbortController | null>(null);
   const streamParserRef = useRef<StreamParser>(new StreamParser());
 
+  // Селекторы из store
   const addMessage = useChatStore((state) => state.addMessage);
-  const appendToStreamingMessage = useChatStore(
-    (state) => state.appendToStreamingMessage
-  );
-  const finalizeStreamingMessage = useChatStore(
-    (state) => state.finalizeStreamingMessage
-  );
+  const updateStreamingMessage = useChatStore((state) => state.updateStreamingMessage); 
+  const finalizeStreamingMessage = useChatStore((state) => state.finalizeStreamingMessage);
   const setStreaming = useChatStore((state) => state.setStreaming);
   const setCitations = useChatStore((state) => state.setCitations);
   const setError = useChatStore((state) => state.setError);
   const activeThreadId = useChatStore((state) => state.activeThreadId);
-  const messages = useChatStore((state) => state.messages);
+  // const streamingMessageId = useChatStore((state) => state.streamingMessageId);
   const isStreaming = useChatStore((state) => state.isStreaming);
-
   const setLoading = useUIStore((state) => state.setLoading);
 
-  const createAssistantMessage = (
-    threadId: string,
-    content: string,
-    citations: Citation[]
-  ): Message => ({
-    id: generateId(),
-    threadId,
-    role: 'assistant',
-    content,
-    citations: citations.length > 0 ? citations : undefined,
-    timestamp: Date.now(),
-    status: 'sent',
-  });
+  /**
+   * Конвертирует BackendChunk в Citation
+   */
+  const convertChunksToCitations = useCallback((chunks: BackendChunk[]): Citation[] => {
+    return chunks.map((chunk, index) => convertBackendChunkToCitation(chunk, index));
+  }, []);
 
-  const createUserMessage = (
+  /**
+   * Создает сообщение пользователя
+   */
+  const createUserMessage = useCallback((
     threadId: string,
     content: string
-  ): Message => ({
-    id: generateId(),
-    threadId,
-    role: 'user',
-    content,
-    timestamp: Date.now(),
-    status: 'sent',
-  });
+  ): Message => {
+    return createOptimisticUserMessage(threadId, content);
+  }, []);
 
+  /**
+   * Отправка сообщения
+   */
   const sendMessage = useCallback(
-    async (content: string, attachments?: File[]) => {
+    async (content: string) => {
       const threadId = activeThreadId;
-
-      if (!threadId || content.trim().length === 0) {
+      
+      if (!threadId) {
+        console.error('No active thread');
+        setError('Нет активного чата');
         return;
       }
 
+      // Преобразуем threadId (string) в sessionId (number)
+      const sessionId = parseInt(threadId, 10);
+      
+      if (isNaN(sessionId)) {
+        console.error('Invalid session ID');
+        setError('Неверный ID сессии');
+        return;
+      }
+
+      if (content.trim().length === 0) {
+        console.error('Empty message');
+        return;
+      }
+
+      // Создаем и добавляем сообщение пользователя
       const userMessage = createUserMessage(threadId, content);
       addMessage(userMessage);
 
+      // Создаем стриминговое сообщение ассистента
+      const streamingMessage = createStreamingAssistantMessage(threadId);
+      addMessage(streamingMessage);
+
+      // Обновляем состояние
       setStreaming(true);
       setLoading(true);
       setError(null);
+      setCitations([]);
 
+      // Сбрасываем парсер и создаем новый AbortController
       streamParserRef.current.reset();
       const abortController = new AbortController();
       abortControllerRef.current = abortController;
 
-      const chatRequest: ChatRequest = {
-        threadId,
-        message: content,
-        attachments,
-        contextMessages: messages.slice(-10).map((msg) => ({
-          role: msg.role,
-          content: msg.content,
-        })),
-        options: {
-          temperature: 0.7,
-          maxTokens: 4096,
-        },
-      };
-
+      // Переменные для накопления данных
       let streamedContent = '';
       const collectedCitations: Citation[] = [];
+      let finalMessageId: number | undefined;
 
       try {
-        for await (const chunk of streamChat(chatRequest, abortController.signal)) {
-          const parsedChunks = streamParserRef.current.parse(chunk);
-
-          for (const parsed of parsedChunks) {
-            switch (parsed.type) {
+        // Вызываем API с потоковой передачей
+        await apiClient.streamChat(
+          sessionId,
+          content,
+          (chunk: StreamChunk) => {
+            switch (chunk.type) {
               case 'text': {
-                if (parsed.content) {
-                  streamedContent += parsed.content;
-                  appendToStreamingMessage(parsed.content);
+                if (chunk.content) {
+                  streamedContent += chunk.content;
+                  // Обновляем стриминговое сообщение
+                  updateStreamingMessage(streamingMessage.id, streamedContent);
                 }
                 break;
               }
 
-              case 'citation': {
-                if (parsed.citation) {
-                  collectedCitations.push(parsed.citation);
+              case 'chunks': {
+                if (chunk.chunks && chunk.chunks.length > 0) {
+                  // Конвертируем чанки в цитаты
+                  const citations = convertChunksToCitations(chunk.chunks);
+                  collectedCitations.push(...citations);
+                  setCitations(collectedCitations);
+                  
+                  // Добавляем информацию об источниках в стриминг
+                  const sourcesText = `\n\n📚 **Источники:**\n${chunk.chunks.map(c => `- ${c.source}`).join('\n')}`;
+                  streamedContent += sourcesText;
+                  updateStreamingMessage(streamingMessage.id, streamedContent);
                 }
                 break;
               }
 
               case 'error': {
-                throw new Error(parsed.error ?? 'Unknown stream error');
+                throw new Error(chunk.error || 'Unknown stream error');
               }
 
               case 'done': {
-                const assistantMessage = createAssistantMessage(
-                  threadId,
-                  streamedContent,
-                  collectedCitations
-                );
-                finalizeStreamingMessage(assistantMessage);
-
-                if (collectedCitations.length > 0) {
-                  setCitations(collectedCitations);
+                if (chunk.messageId) {
+                  finalMessageId = chunk.messageId;
                 }
-                break;
-              }
-
-              case 'metadata': {
-                // Handle metadata if needed
+                
+                // Финальное сообщение с цитатами
+                const finalMessage: Message = {
+                  ...streamingMessage,
+                  id: finalMessageId ? String(finalMessageId) : streamingMessage.id,
+                  content: streamedContent,
+                  citations: collectedCitations.length > 0 ? collectedCitations : undefined,
+                  status: 'sent',
+                  backendId: finalMessageId,
+                };
+                
+                finalizeStreamingMessage(finalMessage);
                 break;
               }
             }
-          }
-        }
+          },
+          abortController.signal
+        );
       } catch (error: unknown) {
         if (error instanceof DOMException && error.name === 'AbortError') {
+          // Пользователь остановил генерацию
           if (streamedContent.length > 0) {
-            const assistantMessage = createAssistantMessage(
-              threadId,
-              `${streamedContent}\n\n[Message generation was stopped]`,
-              collectedCitations
-            );
-            finalizeStreamingMessage(assistantMessage);
+            const finalMessage: Message = {
+              ...streamingMessage,
+              content: `${streamedContent}\n\n_[Генерация сообщения была остановлена пользователем]_`,
+              citations: collectedCitations.length > 0 ? collectedCitations : undefined,
+              status: 'sent',
+            };
+            finalizeStreamingMessage(finalMessage);
+          } else {
+            // Если ничего не было сгенерировано, удаляем стриминговое сообщение
+            finalizeStreamingMessage(null);
           }
         } else {
-          const errorMessage =
-            error instanceof Error ? error.message : 'Failed to send message';
+          // Обработка ошибки
+          const errorMessage = error instanceof Error ? error.message : 'Не удалось отправить сообщение';
           setError(errorMessage);
-          setStreaming(false);
+          
+          // Обновляем сообщение с ошибкой
+          const errorMessageText = `❌ **Ошибка:** ${errorMessage}`;
+          const finalMessage: Message = {
+            ...streamingMessage,
+            content: streamedContent ? `${streamedContent}\n\n${errorMessageText}` : errorMessageText,
+            status: 'error',
+          };
+          finalizeStreamingMessage(finalMessage);
         }
       } finally {
         setLoading(false);
+        setStreaming(false);
         abortControllerRef.current = null;
       }
     },
     [
       activeThreadId,
-      messages,
       addMessage,
-      appendToStreamingMessage,
+      updateStreamingMessage,
       finalizeStreamingMessage,
       setStreaming,
       setCitations,
       setError,
       setLoading,
+      createUserMessage,
+      convertChunksToCitations,
     ]
   );
 
+  /**
+   * Остановка генерации ответа
+   */
   const stopStreaming = useCallback(() => {
     const controller = abortControllerRef.current;
     if (controller) {
@@ -177,9 +219,24 @@ export function useStreamingMessage() {
     }
   }, []);
 
+  /**
+   * Очистка состояния (при смене треда)
+   */
+  const resetStreaming = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+    streamParserRef.current.reset();
+    setStreaming(false);
+    setLoading(false);
+    setError(null);
+  }, [setStreaming, setLoading, setError]);
+
   return {
     sendMessage,
     stopStreaming,
+    resetStreaming,
     isStreaming,
   };
 }
