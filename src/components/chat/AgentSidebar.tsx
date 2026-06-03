@@ -3,6 +3,7 @@ import { useUIStore } from '../../store/uiStore';
 import { AGENTS } from '../../config/agents';
 import { User, Settings, MessageCircle } from 'lucide-react';
 import { ProfileDialog } from '../ui/ProfileDialog';
+import { SettingsDialog } from '../ui/SettingsDialog';
 
 export function AgentSidebar() {
   const activeAgent = useUIStore((state) => state.activeAgent);
@@ -16,6 +17,11 @@ export function AgentSidebar() {
   // Обработчик клика по Профилю
   const handleProfileClick = () => {
     openModal('profile');  // Устанавливаем activeModal = 'profile'
+  };
+
+  // Обработчик клика по Настройкам
+  const handleSettingsClick = () => {
+    openModal('settings');
   };
 
   return (
@@ -69,6 +75,7 @@ export function AgentSidebar() {
         {/* Нижние кнопки */}
         <div className="mt-auto flex flex-col items-center gap-3 pb-4">
           <button
+            onClick={handleSettingsClick}
             className="flex flex-col items-center gap-1 p-2 rounded-xl text-gray-500 hover:bg-[var(--color-surface)] hover:text-[var(--color-accent)] transition-all hover:scale-105"
             title="Настройки"
           >
@@ -94,6 +101,12 @@ export function AgentSidebar() {
       {/* Рендерим модалку - она будет открываться, когда activeModal === 'profile' */}
       <ProfileDialog 
         isOpen={activeModal === 'profile'} 
+        onClose={closeModal} 
+      />
+
+      {/* Рендерим модалку настроек */}
+      <SettingsDialog 
+        isOpen={activeModal === 'settings'} 
         onClose={closeModal} 
       />
     </>
