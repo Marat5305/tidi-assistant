@@ -294,7 +294,7 @@ export const useChatStore = create<ChatStore>()(
             messages: [...state.messages, botMessage],
             isStreaming: false,
            }));
-        }, 2500);
+        }, 1500);
       },
       
       setMasterMode: (enabled: boolean) => set({ isMasterMode: enabled }),
