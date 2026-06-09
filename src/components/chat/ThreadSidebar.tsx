@@ -123,8 +123,8 @@ export function ThreadSidebar() {
                           className={`
                             group relative px-3 py-2 rounded-lg cursor-pointer transition-all
                             ${activeThreadId === thread.id 
-                              ? 'bg-[var(--color-accent)]/15 dark:bg-blue-900/50' 
-                              : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                              ? 'bg-[var(--color-accent)]/50 dark:bg-blue-900/50' 
+                              : 'hover:bg-[var(--color-accent)]/15 dark:hover:bg-gray-800'
                             }
                           `}
                         >

@@ -1,5 +1,5 @@
 // src/components/chat/MessageList.tsx
-import { useRef, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { MessageItem } from './MessageItem';
 import { MessageFeedback } from './MessageFeedback';
 import { SuggestionButtons } from './SuggestionButtons';
@@ -7,9 +7,13 @@ import { CitationsPanel } from './CitationsPanel';
 import { useChatStore } from '../../store/chatStore';
 import { type SuggestionAction } from '../../types/chat';
 
-export function MessageList() {
+interface MessageListProps {
+  bottomRef: React.RefObject<HTMLDivElement | null>;  // ref будет приходить из ChatContainer
+}
+
+// Компонент принимает проп bottomRef
+export function MessageList({ bottomRef }: MessageListProps) {
   const { messages, isMasterMode } = useChatStore();
-  const bottomRef = useRef<HTMLDivElement>(null);
   const [activeCitationId, setActiveCitationId] = useState<string | null>(null);
   
   // Функция, возвращающая статичные подсказки для всех ассистентов
@@ -35,24 +39,13 @@ export function MessageList() {
 
   // Обработчик клика по подсказке
   const handleSuggestionClick = (prompt: string) => {
-  // Получаем функцию sendMessage из store
-  const { sendMessage, isStreaming } = useChatStore.getState();
-  
-  // Не отправляем, если уже идёт стриминг
-  if (isStreaming) {
-    return;
-  }
-  
-  // Отправляем сообщение
-  sendMessage(prompt);
-};
-  
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const { sendMessage, isStreaming } = useChatStore.getState();
+    if (isStreaming) return;
+    sendMessage(prompt);
+  };
   
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+    <div id="message-list-container" className="flex-1 overflow-y-auto py-4 px-6 space-y-3 relative">
       {messages.map((message) => (
         <div key={message.id}>
           <MessageItem 
@@ -62,14 +55,13 @@ export function MessageList() {
           />
           {!isMasterMode && message.role === 'assistant' && (
             <>
-              <MessageFeedback 
-                messageId={message.id} 
-                messageContent={message.content} 
-              />
-              {/* 👇 НОВЫЙ БЛОК КНОПОК-ПОДСКАЗОК */}
               <SuggestionButtons 
                 suggestions={getDefaultSuggestions()}
                 onSuggestionClick={handleSuggestionClick}
+              />
+              <MessageFeedback 
+                messageId={message.id} 
+                messageContent={message.content} 
               />
               {message.citations && message.citations.length > 0 && (
                 <CitationsPanel 
@@ -82,6 +74,7 @@ export function MessageList() {
           )}
         </div>
       ))}
+      {/* bottomRef приходит извне */}
       <div ref={bottomRef} />
     </div>
   );
